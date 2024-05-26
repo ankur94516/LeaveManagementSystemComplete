@@ -14,21 +14,25 @@ public class LeaveTypesController : Controller
     }
 
     // GET: LeaveTypes
-    public async Task<IActionResult> Index()
+    public async Task<ActionResult<IEnumerable<LeaveType>>> Index()
     {
-        return View(await _context.LeaveTypes.ToListAsync());
+        IEnumerable<LeaveType> leaveTypes = await _context.LeaveTypes
+                                                          .AsNoTracking()
+                                                          .ToListAsync();
+        return View(leaveTypes);
     }
 
     // GET: LeaveTypes/Details/5
-    public async Task<IActionResult> Details(int? id)
+    public async Task<ActionResult<LeaveType>> Details(int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var leaveType = await _context.LeaveTypes
-            .FirstOrDefaultAsync(m => m.Id == id);
+        LeaveType? leaveType = await _context.LeaveTypes
+                                             .AsNoTracking()
+                                             .FirstOrDefaultAsync(leaveType => leaveType.Id == id);
         if (leaveType == null)
         {
             return NotFound();
