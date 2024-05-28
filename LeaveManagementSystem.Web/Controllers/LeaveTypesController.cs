@@ -1,4 +1,5 @@
 ﻿using LeaveManagementSystem.Web.Data;
+using LeaveManagementSystem.Web.Models.LeaveTypes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,25 @@ public class LeaveTypesController : Controller
         IEnumerable<LeaveType> leaveTypes = await _context.LeaveTypes
                                                           .AsNoTracking()
                                                           .ToListAsync();
-        return View(leaveTypes);
+
+        // populate the view model and pass the view model to the view
+
+        IEnumerable<IndexVM> indexVM = from lt in leaveTypes
+                                       select new IndexVM
+                                       {
+                                           Id = lt.Id,
+                                           Name = lt.Name,
+                                           Days = lt.NumberOfDays,
+                                       };
+
+        indexVM = leaveTypes.Select(leaveType => new IndexVM
+                                       {
+                                           Id = leaveType.Id,
+                                           Name = leaveType.Name,
+                                           Days = leaveType.NumberOfDays,
+                                       });
+
+        return View(indexVM);
     }
 
     // GET: LeaveTypes/Details/5
