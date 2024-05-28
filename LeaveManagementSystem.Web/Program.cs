@@ -1,6 +1,7 @@
+global using AutoMapper;
 global using LeaveManagementSystem.Web.Data;
 global using LeaveManagementSystem.Web.Models.LeaveTypes;
-global using AutoMapper;
+global using System.ComponentModel.DataAnnotations;
 using LeaveManagementSystem.Web.Mappings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

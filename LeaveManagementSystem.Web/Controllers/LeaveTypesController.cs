@@ -76,12 +76,15 @@ public class LeaveTypesController : Controller
     }
 
     // POST: LeaveTypes/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(LeaveTypeCreateVM leaveTypeCreate)
     {
+        if (leaveTypeCreate.Name.Contains("vacation"))
+        {
+            ModelState.AddModelError(nameof(leaveTypeCreate.Name), "The name should not contain vacation.");
+        }
+
         if (!ModelState.IsValid)
         {
             return View(leaveTypeCreate);

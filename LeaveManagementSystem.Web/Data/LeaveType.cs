@@ -1,4 +1,4 @@
-﻿global using System.ComponentModel.DataAnnotations;
+﻿
 
 namespace LeaveManagementSystem.Web.Data;
 
