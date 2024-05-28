@@ -1,6 +1,4 @@
-﻿using LeaveManagementSystem.Web.Data;
-using LeaveManagementSystem.Web.Models.LeaveTypes;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagementSystem.Web.Controllers;
@@ -8,14 +6,16 @@ namespace LeaveManagementSystem.Web.Controllers;
 public class LeaveTypesController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper;
 
-    public LeaveTypesController(ApplicationDbContext context)
+    public LeaveTypesController(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     // GET: LeaveTypes
-    public async Task<ActionResult<IEnumerable<LeaveType>>> Index()
+    public async Task<ViewResult> Index()
     {
         IEnumerable<LeaveType> leaveTypes = await _context.LeaveTypes
                                                           .AsNoTracking()
@@ -23,25 +23,31 @@ public class LeaveTypesController : Controller
 
         // populate the view model and pass the view model to the view
 
-        IEnumerable<IndexVM> indexVM = from lt in leaveTypes
-                                       select new IndexVM
-                                       {
-                                           Id = lt.Id,
-                                           Name = lt.Name,
-                                           Days = lt.NumberOfDays,
-                                       };
+        // code written for practice purpose only
+        IEnumerable<LeaveTypeReadOnlyVM> indexVM_practice = from lt in leaveTypes
+                                                            select new LeaveTypeReadOnlyVM
+                                                            {
+                                                                Id = lt.Id,
+                                                                Name = lt.Name,
+                                                                Days = lt.NumberOfDays,
+                                                            };
 
-        indexVM = leaveTypes.Select(leaveType => new IndexVM
-                                       {
-                                           Id = leaveType.Id,
-                                           Name = leaveType.Name,
-                                           Days = leaveType.NumberOfDays,
-                                       });
+        indexVM_practice = leaveTypes.Select(leaveType => new LeaveTypeReadOnlyVM
+        {
+            Id = leaveType.Id,
+            Name = leaveType.Name,
+            Days = leaveType.NumberOfDays,
+        });
+
+        // conversion via IMapper
+        // IMapper.Map<DestinationType>(sourceDataObj);
+        IEnumerable<LeaveTypeReadOnlyVM> indexVM = _mapper.Map<IEnumerable<LeaveTypeReadOnlyVM>>(leaveTypes);
 
         return View(indexVM);
     }
 
     // GET: LeaveTypes/Details/5
+    [HttpGet]
     public async Task<ActionResult<LeaveType>> Details(int? id)
     {
         if (id == null)
@@ -57,7 +63,10 @@ public class LeaveTypesController : Controller
             return NotFound();
         }
 
-        return View(leaveType);
+        // convert leaveType to View Model
+        LeaveTypeReadOnlyVM viewModelData = _mapper.Map<LeaveTypeReadOnlyVM>(leaveType);
+
+        return View(viewModelData);
     }
 
     // GET: LeaveTypes/Create
@@ -71,15 +80,20 @@ public class LeaveTypesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,NumberOfDays")] LeaveType leaveType)
+    public async Task<IActionResult> Create(LeaveTypeCreateVM leaveTypeCreate)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _context.Add(leaveType);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return View(leaveTypeCreate);
         }
-        return View(leaveType);
+
+        // conversion from view model to entity
+
+        LeaveType leaveType = _mapper.Map<LeaveType>(leaveTypeCreate);
+
+        _context.Add(leaveType);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: LeaveTypes/Edit/5
@@ -110,27 +124,30 @@ public class LeaveTypesController : Controller
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            try
-            {
-                _context.Update(leaveType);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LeaveTypeExists(leaveType.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
+            return View(leaveType);
         }
-        return View(leaveType);
+
+        try
+        {
+            // _context.Entry(leaveType).State = EntityState.Modified;
+
+            _context.Update(leaveType);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!LeaveTypeExists(leaveType.Id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: LeaveTypes/Delete/5

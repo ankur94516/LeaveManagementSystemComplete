@@ -1,4 +1,7 @@
-using LeaveManagementSystem.Web.Data;
+global using LeaveManagementSystem.Web.Data;
+global using LeaveManagementSystem.Web.Models.LeaveTypes;
+global using AutoMapper;
+using LeaveManagementSystem.Web.Mappings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +16,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// adding AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
