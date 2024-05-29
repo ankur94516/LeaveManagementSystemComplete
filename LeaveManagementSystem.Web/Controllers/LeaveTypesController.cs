@@ -7,6 +7,7 @@ public class LeaveTypesController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private const string NameExistsValidationMessage = "Name already exists";
 
     public LeaveTypesController(ApplicationDbContext context, IMapper mapper)
     {
@@ -80,6 +81,12 @@ public class LeaveTypesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(LeaveTypeCreateVM leaveTypeCreate)
     {
+        // check if the name already exists in the database
+        if (await CheckLeaveTypeNameExists(leaveTypeCreate.Name))
+        {
+            ModelState.AddModelError(nameof(leaveTypeCreate.Name), NameExistsValidationMessage);
+        }
+
         // adding custom validation and model state error.
         if (leaveTypeCreate.Name.Contains("vacation"))
         {
@@ -99,6 +106,8 @@ public class LeaveTypesController : Controller
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
+
+    
 
     // GET: LeaveTypes/Edit/5
     public async Task<IActionResult> Edit(int? id)
@@ -127,6 +136,10 @@ public class LeaveTypesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, LeaveTypeEditVM leaveTypeEdit)
     {
+        if (await CheckLeaveTypeNameExistsForEdit(leaveTypeEdit))
+        {
+            ModelState.AddModelError(nameof(leaveTypeEdit.Name), NameExistsValidationMessage);
+        }
         if (id != leaveTypeEdit.Id)
         {
             return NotFound();
@@ -199,5 +212,19 @@ public class LeaveTypesController : Controller
     private bool LeaveTypeExists(int id)
     {
         return _context.LeaveTypes.Any(e => e.Id == id);
+    }
+
+    private async Task<bool> CheckLeaveTypeNameExists(string name)
+    {
+        return await _context.LeaveTypes
+                       .AnyAsync(leaveType => leaveType.Name.ToLower()
+                                                .Contains(name.ToLower()));
+    }
+
+    private async Task<bool> CheckLeaveTypeNameExistsForEdit(LeaveTypeEditVM leaveTypeEdit)
+    {
+        return await _context.LeaveTypes
+                             .AnyAsync(lt => lt.Name.ToLower().Contains(leaveTypeEdit.Name.ToLower()) 
+                                                        && lt.Id != leaveTypeEdit.Id);
     }
 }
