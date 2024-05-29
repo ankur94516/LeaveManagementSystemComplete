@@ -4,9 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagementSystem.Web.Controllers;
 
-public class LeaveTypesController(ILeaveTypeService leaveTypeService) : Controller
+public class LeaveTypesController(ILeaveTypeService _leaveTypeService) : Controller
 {
-    private readonly ILeaveTypeService _leaveTypeService = leaveTypeService;
     private const string NameExistsValidationMessage = "Name already exists";
 
     // GET: LeaveTypes

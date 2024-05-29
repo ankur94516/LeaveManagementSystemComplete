@@ -2,11 +2,8 @@
 
 namespace LeaveManagementSystem.Web.Services;
 
-public class LeaveTypeService(IMapper mapper, ApplicationDbContext context) : ILeaveTypeService
+public class LeaveTypeService(IMapper _mapper, ApplicationDbContext _context) : ILeaveTypeService
 {
-    private readonly IMapper _mapper = mapper;
-    private readonly ApplicationDbContext _context = context;
-
     // get list of leaveTypes
     public async Task<IEnumerable<LeaveTypeReadOnlyVM>> GetAllAsync()
     {
