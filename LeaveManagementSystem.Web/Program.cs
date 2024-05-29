@@ -3,6 +3,7 @@ global using LeaveManagementSystem.Web.Data;
 global using LeaveManagementSystem.Web.Models.LeaveTypes;
 global using System.ComponentModel.DataAnnotations;
 using LeaveManagementSystem.Web.Mappings;
+using LeaveManagementSystem.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,9 @@ builder.Services.AddControllersWithViews();
 
 // adding AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// adding leavetype service
+builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
 
 var app = builder.Build();
 

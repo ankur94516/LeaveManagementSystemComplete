@@ -4,8 +4,8 @@ namespace LeaveManagementSystem.Web.Services;
 
 public class LeaveTypeService(IMapper mapper, ApplicationDbContext context) : ILeaveTypeService
 {
-    private readonly IMapper _mapper;
-    private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper = mapper;
+    private readonly ApplicationDbContext _context = context;
 
     // get list of leaveTypes
     public async Task<IEnumerable<LeaveTypeReadOnlyVM>> GetAllAsync()
@@ -73,19 +73,19 @@ public class LeaveTypeService(IMapper mapper, ApplicationDbContext context) : IL
 
     // private methods goes here
 
-    private bool LeaveTypeExists(int id)
+    public async Task<bool> LeaveTypeExists(int id)
     {
-        return _context.LeaveTypes.Any(e => e.Id == id);
+        return await _context.LeaveTypes.AnyAsync(e => e.Id == id);
     }
 
-    private async Task<bool> CheckLeaveTypeNameExists(string name)
+    public async Task<bool> CheckLeaveTypeNameExists(string name)
     {
         return await _context.LeaveTypes
                        .AnyAsync(leaveType => leaveType.Name.ToLower()
                                                 .Contains(name.ToLower()));
     }
 
-    private async Task<bool> CheckLeaveTypeNameExistsForEdit(LeaveTypeEditVM leaveTypeEdit)
+    public async Task<bool> CheckLeaveTypeNameExistsForEdit(LeaveTypeEditVM leaveTypeEdit)
     {
         return await _context.LeaveTypes
                              .AnyAsync(lt => lt.Name.ToLower().Contains(leaveTypeEdit.Name.ToLower())
