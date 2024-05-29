@@ -19,5 +19,9 @@ public class MappingProfile: Profile
 
         CreateMap<LeaveTypeCreateVM, LeaveType>()
             .ForMember(dest => dest.NumberOfDays, option => option.MapFrom(src => src.Days));
+
+        CreateMap<LeaveType, LeaveTypeEditVM>()
+            .ForMember(dest => dest.Days, options => options.MapFrom(src => src.NumberOfDays))
+            .ReverseMap();
     }
 }

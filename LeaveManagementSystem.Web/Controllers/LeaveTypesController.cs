@@ -80,6 +80,7 @@ public class LeaveTypesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(LeaveTypeCreateVM leaveTypeCreate)
     {
+        // adding custom validation and model state error.
         if (leaveTypeCreate.Name.Contains("vacation"))
         {
             ModelState.AddModelError(nameof(leaveTypeCreate.Name), "The name should not contain vacation.");
@@ -107,12 +108,16 @@ public class LeaveTypesController : Controller
             return NotFound();
         }
 
-        var leaveType = await _context.LeaveTypes.FindAsync(id);
+        LeaveType? leaveType = await _context.LeaveTypes.FindAsync(id);
         if (leaveType == null)
         {
             return NotFound();
         }
-        return View(leaveType);
+
+        // convert the LeaveType Entity to LeaveTypeEditVM
+        LeaveTypeEditVM leaveTypeViewData = _mapper.Map<LeaveTypeEditVM>(leaveType);
+
+        return View(leaveTypeViewData);
     }
 
     // POST: LeaveTypes/Edit/5
@@ -120,28 +125,30 @@ public class LeaveTypesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,NumberOfDays")] LeaveType leaveType)
+    public async Task<IActionResult> Edit(int id, LeaveTypeEditVM leaveTypeEdit)
     {
-        if (id != leaveType.Id)
+        if (id != leaveTypeEdit.Id)
         {
             return NotFound();
         }
 
         if (!ModelState.IsValid)
         {
-            return View(leaveType);
+            return View(leaveTypeEdit);
         }
 
         try
         {
-            // _context.Entry(leaveType).State = EntityState.Modified;
+            // convert from view model to entity
+            LeaveType leaveType = _mapper.Map<LeaveType>(leaveTypeEdit);
 
+            // _context.Entry(leaveType).State = EntityState.Modified;
             _context.Update(leaveType);
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!LeaveTypeExists(leaveType.Id))
+            if (!LeaveTypeExists(leaveTypeEdit.Id))
             {
                 return NotFound();
             }
@@ -161,14 +168,17 @@ public class LeaveTypesController : Controller
             return NotFound();
         }
 
-        var leaveType = await _context.LeaveTypes
-            .FirstOrDefaultAsync(m => m.Id == id);
+        LeaveType? leaveType = await _context.LeaveTypes
+                                             .FirstOrDefaultAsync(m => m.Id == id);
         if (leaveType == null)
         {
             return NotFound();
         }
 
-        return View(leaveType);
+        // convert from Entity to View Model
+        LeaveTypeReadOnlyVM leaveTypeViewData =  _mapper.Map<LeaveTypeReadOnlyVM>(leaveType);
+
+        return View(leaveTypeViewData);
     }
 
     // POST: LeaveTypes/Delete/5
