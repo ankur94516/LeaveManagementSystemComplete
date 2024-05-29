@@ -49,7 +49,7 @@ public class LeaveTypesController : Controller
 
     // GET: LeaveTypes/Details/5
     [HttpGet]
-    public async Task<ActionResult<LeaveType>> Details(int? id)
+    public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
         {
@@ -99,7 +99,6 @@ public class LeaveTypesController : Controller
         }
 
         // conversion from view model to entity
-
         LeaveType leaveType = _mapper.Map<LeaveType>(leaveTypeCreate);
 
         _context.Add(leaveType);
