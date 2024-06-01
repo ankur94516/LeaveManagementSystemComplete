@@ -1,5 +1,4 @@
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,6 +17,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // adding leavetype service
 builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
+
+// adding email service
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

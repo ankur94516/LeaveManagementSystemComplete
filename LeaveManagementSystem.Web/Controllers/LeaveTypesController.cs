@@ -1,9 +1,8 @@
-﻿using LeaveManagementSystem.Web.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿global using LeaveManagementSystem.Web.Common;
 
 namespace LeaveManagementSystem.Web.Controllers;
 
+[Authorize(Roles = Role.Administrator)]
 public class LeaveTypesController(ILeaveTypeService _leaveTypeService) : Controller
 {
     private const string NameExistsValidationMessage = "Name already exists";
