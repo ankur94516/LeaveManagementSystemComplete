@@ -1,6 +1,4 @@
-﻿
-
-namespace LeaveManagementSystem.Web.Data;
+﻿namespace LeaveManagementSystem.Web.Data;
 
 public class LeaveType
 {
